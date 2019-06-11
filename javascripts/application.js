@@ -46,7 +46,7 @@ function Dball() {
 // https://gist.github.com/jcgregorio/3b9b06b38582e6e4c4ed
 var dx;
 var dy;
-function mouse() {
+(function () {
 	// The current mouse position in DOM content coordinates.
 	var clientX = 0.0;
 	var clientY = 0.0;
@@ -81,7 +81,7 @@ function mouse() {
 	};
 	decision();
 
-}
+})();
 // rotate 
 // http://www.williammalone.com/briefs/how-to-rotate-html5-canvas-around-center/
 // https://webisora.com/blog/rotate-elements-using-javascript/
@@ -89,7 +89,7 @@ var loop = function draw(){
 	ctx.clearRect(cannonX,canvas.height-cannonHeight, cannonWidth, cannonHeight);
 	Dball();
 	Dcannon();
-	mouse();
+	//mouse();
 	window.requestAnimationFrame(loop);
 }
 loop();
@@ -103,10 +103,13 @@ function shoot() {
 	if( x+2*dx > canvas.width-ballRadius || x+2*dx < ballRadius){
 		dx = -dx;
 	} 
-	else if(y+2*dy > canvas.height -ballRadius || y+2*dy < ballRadius) {
+	else if( y+2*dy < ballRadius) {
 		dy = -dy;
+	} 
+	if (!(y+2*dy > canvas.height -ballRadius)){
+		window.requestAnimationFrame(shoot);
 	}
-	window.requestAnimationFrame(shoot);
+	
 	//var cv = document.getElementById("myCanvas");
 	//var pos = elePos(cv);
 }
