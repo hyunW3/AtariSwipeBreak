@@ -23,17 +23,17 @@ var ballcount =1;
 
 // 벽돌만들기
 var brickRowCount = 4;
-var brickColumnCount = 5;
-var brickWidth = 75;
+var brickColumnCount = 6;
+var brickWidth = 70;
 var brickHeight = 20;
 var brickPadding = 3;
 var brickOffsetTop = 30;
-var brickOffsetLeft = 40;
+var brickOffsetLeft = 20;
 var bricks =[];
 for (var c=0; c<brickColumnCount; c++){
 	bricks[c] = [];
 	for( var r=0; r<brickRowCount; r++){
-		bricks[c][r] = {x:0, y:0, status: 1};
+		bricks[c][r] = {x:0, y:0, status: (Math.floor(Math.random()*level)+1)};
 	}
 }
 
@@ -50,6 +50,10 @@ function drawBricks() {
 				ctx.fillStyle = "#0095FF";
 				ctx.fill();
 				ctx.closePath();
+				ctx.beginPath();
+				ctx.font = "12px Arial";
+				ctx.fillStyle = "black";
+				ctx.fillText(status,brickWidth/2,brickHeight/2);
 			}
 		}
 	}
@@ -57,7 +61,7 @@ function drawBricks() {
 function showStage() {
 	ctx.font = "16px Arial";
 	ctx.fillStyle = "#0095DD";
-	ctx.fillText("Stage: "+ballcount, canvas.width-80,20);
+	ctx.fillText("Stage: "+ ballcount, canvas.width-80,20);
 }
 // 충돌감지
 function collisionDetection() {
@@ -67,7 +71,7 @@ function collisionDetection() {
 			if(b.status == 1){
 				if(x > b.x && x< b.x+brickWidth && y> b.y && y< b.y+brickHeight){
 					dy = -dy;
-					b.status = 0;
+					b.status--;
 					brokenBrickN++;
 					if(brokenBrickN == brickRowCount*brickColumnCount){
 						alert("Next stage");
