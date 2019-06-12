@@ -2,8 +2,14 @@ var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
 var info = document.getElementById("info").getContext("2d")
 
-var x = canvas.width/2;
-var y = canvas.height-30;
+var x;
+var y;
+function init() {
+	x = canvas.width/2;
+	y = canvas.height-30;
+	window.requestAnimationFrame(mouse);	
+};
+init();
 var ballRadius = 8;
 var level =1;
 
@@ -12,6 +18,68 @@ var cannonWidth = 10;
 var cannonX = (canvas.width-cannonWidth)/2;
 
 var mouseClick = false;
+var brokenBrickN =0;
+var ballcount =1;
+
+// 벽돌만들기
+var brickRowCount = 4;
+var brickColumnCount = 5;
+var brickWidth = 75;
+var brickHeight = 20;
+var brickPadding = 3;
+var brickOffsetTop = 30;
+var brickOffsetLeft = 40;
+var bricks =[];
+for (var c=0; c<brickColumnCount; c++){
+	bricks[c] = [];
+	for( var r=0; r<brickRowCount; r++){
+		bricks[c][r] = {x:0, y:0, status: 1};
+	}
+}
+
+function drawBricks() {
+	for( var c=0; c<brickColumnCount; c++){
+		for(var r=0; r<brickRowCount; r++){
+			if(bricks[c][r].status == 1){
+				var brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
+				var brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
+				bricks[c][r].x = brickX;
+				bricks[c][r].y = brickY;
+				ctx.beginPath();
+				ctx.rect(brickX, brickY, brickWidth, brickHeight);
+				ctx.fillStyle = "#0095FF";
+				ctx.fill();
+				ctx.closePath();
+			}
+		}
+	}
+}
+function showStage() {
+	ctx.font = "16px Arial";
+	ctx.fillStyle = "#0095DD";
+	ctx.fillText("Stage: "+ballcount, canvas.width-80,20);
+}
+// 충돌감지
+function collisionDectection () {
+	for(var c=0; c<brickColumnCount; c++){
+		for(var r=0; c<brickRowCount; r++){
+			var b = bricks[c][r];
+			if(bricks[c][r].status == 1){
+				if(x > b.x && x < b.x+brickWidth && y >b.y && y < b.y+brickHeight){
+					dy = -dy;
+					b.status =0;
+					if(++brokenBrickN == brickRowCount*brickColumnCount){
+						alert("Next stage");
+						ballcount++;
+						init();
+					}
+
+				}
+			}
+		}
+	}
+}
+
 
 function Dcannon() {
 	ctx.beginPath();
@@ -29,8 +97,14 @@ function Dball() {
 	ctx.fill();
 	ctx.closePath();
 }
+//track the moust position
+// https://www.w3schools.com/js/js_events_examples.asp
+// https://gist.github.com/jcgregorio/3b9b06b38582e6e4c4ed
+var dx;
+var dy;
+function mouse() {
 	// Returns the position of the top left corner
-      // of an element in DOM content coordinates.
+     // of an element in DOM content coordinates.
     function elePos(ele) {
         var ax = ele.offsetLeft;
         var ay = ele.offsetTop;
@@ -41,12 +115,6 @@ function Dball() {
         }
       return {"ax": ax, "ay": ay};
   	};
-//track the moust position
-// https://www.w3schools.com/js/js_events_examples.asp
-// https://gist.github.com/jcgregorio/3b9b06b38582e6e4c4ed
-var dx;
-var dy;
-(function () {
 	// The current mouse position in DOM content coordinates.
 	var clientX = 0.0;
 	var clientY = 0.0;
@@ -81,18 +149,21 @@ var dy;
 	};
 	decision();
 
-})();
+};
 // rotate 
 // http://www.williammalone.com/briefs/how-to-rotate-html5-canvas-around-center/
 // https://webisora.com/blog/rotate-elements-using-javascript/
-var loop = function draw(){
+function draw(){
 	ctx.clearRect(cannonX,canvas.height-cannonHeight, cannonWidth, cannonHeight);
 	Dball();
 	Dcannon();
+	drawBricks();
+	showStage();
+	//drawBricks();
 	//mouse();
-	window.requestAnimationFrame(loop);
+	window.requestAnimationFrame(draw);
 }
-loop();
+draw();
 
 
 
@@ -109,7 +180,7 @@ function shoot() {
 	if (!(y+2*dy > canvas.height -ballRadius)){
 		window.requestAnimationFrame(shoot);
 	}
-	
+	collisionDectection();
 	//var cv = document.getElementById("myCanvas");
 	//var pos = elePos(cv);
 }
