@@ -40,7 +40,7 @@ for (var c=0; c<brickColumnCount; c++){
 function drawBricks() {
 	for( var c=0; c<brickColumnCount; c++){
 		for(var r=0; r<brickRowCount; r++){
-			if(bricks[c][r].status == 1){
+			if(bricks[c][r].status > 0){
 				var brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
 				var brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
 				bricks[c][r].x = brickX;
@@ -60,15 +60,16 @@ function showStage() {
 	ctx.fillText("Stage: "+ballcount, canvas.width-80,20);
 }
 // 충돌감지
-function collisionDectection () {
+function collisionDetection() {
 	for(var c=0; c<brickColumnCount; c++){
-		for(var r=0; c<brickRowCount; r++){
+		for(var r=0; r<brickRowCount; r++){
 			var b = bricks[c][r];
-			if(bricks[c][r].status == 1){
-				if(x > b.x && x < b.x+brickWidth && y >b.y && y < b.y+brickHeight){
+			if(b.status == 1){
+				if(x > b.x && x< b.x+brickWidth && y> b.y && y< b.y+brickHeight){
 					dy = -dy;
-					b.status =0;
-					if(++brokenBrickN == brickRowCount*brickColumnCount){
+					b.status = 0;
+					brokenBrickN++;
+					if(brokenBrickN == brickRowCount*brickColumnCount){
 						alert("Next stage");
 						ballcount++;
 						init();
@@ -154,13 +155,13 @@ function mouse() {
 // http://www.williammalone.com/briefs/how-to-rotate-html5-canvas-around-center/
 // https://webisora.com/blog/rotate-elements-using-javascript/
 function draw(){
-	ctx.clearRect(cannonX,canvas.height-cannonHeight, cannonWidth, cannonHeight);
+	ctx.clearRect(0,0, canvas.width, canvas.height-cannonHeight);
+	drawBricks();
 	Dball();
 	Dcannon();
-	drawBricks();
 	showStage();
-	//drawBricks();
 	//mouse();
+
 	window.requestAnimationFrame(draw);
 }
 draw();
@@ -171,6 +172,7 @@ function shoot() {
 	//Dball();
 	x += dx*2;
 	y += dy*2;
+	collisionDetection();
 	if( x+2*dx > canvas.width-ballRadius || x+2*dx < ballRadius){
 		dx = -dx;
 	} 
@@ -179,8 +181,12 @@ function shoot() {
 	} 
 	if (!(y+2*dy > canvas.height -ballRadius)){
 		window.requestAnimationFrame(shoot);
+	} else{
+		alert("died!");
+		init();
+		document.location.reload();
 	}
-	collisionDectection();
+	
 	//var cv = document.getElementById("myCanvas");
 	//var pos = elePos(cv);
 }
