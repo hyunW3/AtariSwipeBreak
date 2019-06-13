@@ -1,3 +1,4 @@
+//  cd ~/Desktop/Project/WEB/벽돌깨기\ 심화/
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
 var info = document.getElementById("info").getContext("2d")
@@ -7,11 +8,14 @@ var y;
 function init() {
 	x = canvas.width/2;
 	y = canvas.height-30;
-	window.requestAnimationFrame(mouse);	
+	brickCount=0;
+	brokenBrickN =0;
+	brickinit();
+	window.requestAnimationFrame(mouse);
+
 };
 init();
 var ballRadius = 8;
-var level =1;
 
 var cannonHeight = 20;
 var cannonWidth = 10;
@@ -19,41 +23,50 @@ var cannonX = (canvas.width-cannonWidth)/2;
 
 var mouseClick = false;
 var brokenBrickN =0;
-var ballcount =1;
+var brickCount =0;
+var level =1;
 
 // 벽돌만들기
 var brickRowCount = 4;
 var brickColumnCount = 6;
 var brickWidth = 70;
-var brickHeight = 20;
+var brickHeight = 30;
 var brickPadding = 3;
-var brickOffsetTop = 30;
+var brickOffsetTop = 20;
 var brickOffsetLeft = 20;
 var bricks =[];
-for (var c=0; c<brickColumnCount; c++){
-	bricks[c] = [];
-	for( var r=0; r<brickRowCount; r++){
-		bricks[c][r] = {x:0, y:0, status: (Math.floor(Math.random()*level)+1)};
-	}
+function brickinit() {
+	for (var c=0; c<brickColumnCount; c++){
+		bricks[c] = [];
+		for( var r=0; r<brickRowCount; r++){
+			var st = (Math.floor(Math.random()*level)+1);
+			brickCount += st; 
+			bricks[c][r] = {x:0, y:0, status: st};
+		}
+	}	
+	brokenBrickN = 0;
+
 }
+brickinit();
 
 function drawBricks() {
 	for( var c=0; c<brickColumnCount; c++){
 		for(var r=0; r<brickRowCount; r++){
-			if(bricks[c][r].status > 0){
+			var b = bricks[c][r];
+			if(b.status > 0){
 				var brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
 				var brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
-				bricks[c][r].x = brickX;
-				bricks[c][r].y = brickY;
+				b.x = brickX;
+				b.y = brickY;
 				ctx.beginPath();
 				ctx.rect(brickX, brickY, brickWidth, brickHeight);
 				ctx.fillStyle = "#0095FF";
 				ctx.fill();
-				ctx.closePath();
-				ctx.beginPath();
+				//status number
 				ctx.font = "12px Arial";
-				ctx.fillStyle = "black";
-				ctx.fillText(status,brickWidth/2,brickHeight/2);
+				ctx.fillStyle = "#ff0000";
+				ctx.fillText(b.status, brickX+brickWidth/2, brickY+brickHeight/2+5);
+				ctx.closePath();
 			}
 		}
 	}
@@ -61,23 +74,33 @@ function drawBricks() {
 function showStage() {
 	ctx.font = "16px Arial";
 	ctx.fillStyle = "#0095DD";
-	ctx.fillText("Stage: "+ ballcount, canvas.width-80,20);
+	ctx.fillText("Stage: "+ level, canvas.width-80,20);
 }
 // 충돌감지
 function collisionDetection() {
 	for(var c=0; c<brickColumnCount; c++){
 		for(var r=0; r<brickRowCount; r++){
 			var b = bricks[c][r];
-			if(b.status == 1){
+			if(b.status > 0){
+				function exec() {
+						b.status--;
+						brokenBrickN++;
+						if(brokenBrickN == brickCount){
+							alert("Next stage");
+							level++;
+							mouseClick = false;
+							window.cancelAnimationFrame(shoot);
+							init();
+
+						}
+					}
 				if(x > b.x && x< b.x+brickWidth && y> b.y && y< b.y+brickHeight){
 					dy = -dy;
-					b.status--;
-					brokenBrickN++;
-					if(brokenBrickN == brickRowCount*brickColumnCount){
-						alert("Next stage");
-						ballcount++;
-						init();
-					}
+					exec()
+					
+				}else if(x < b.x && x > b.x+brickWidth && y> b.y && y< b.y+brickHeight ){
+					dx = -dx;
+					exec();
 
 				}
 			}
@@ -159,7 +182,7 @@ function mouse() {
 // http://www.williammalone.com/briefs/how-to-rotate-html5-canvas-around-center/
 // https://webisora.com/blog/rotate-elements-using-javascript/
 function draw(){
-	ctx.clearRect(0,0, canvas.width, canvas.height-cannonHeight);
+	ctx.clearRect(0,0, canvas.width, canvas.height); //-cannonHeight);
 	drawBricks();
 	Dball();
 	Dcannon();
@@ -174,9 +197,11 @@ draw();
 
 function shoot() {
 	//Dball();
+	if(mouseClick){
 	x += dx*2;
 	y += dy*2;
 	collisionDetection();
+	/*
 	if( x+2*dx > canvas.width-ballRadius || x+2*dx < ballRadius){
 		dx = -dx;
 	} 
@@ -190,9 +215,17 @@ function shoot() {
 		init();
 		document.location.reload();
 	}
-	
+	*/
+	if( x+2*dx > canvas.width-ballRadius || x+2*dx < ballRadius){
+		dx = -dx;
+	} 
+	else if( y+2*dy < ballRadius || (y+2*dy > canvas.height -ballRadius)) {
+		dy = -dy;
+	} 
+	window.requestAnimationFrame(shoot);
 	//var cv = document.getElementById("myCanvas");
 	//var pos = elePos(cv);
+}
 }
 
 document.addEventListener("click", function(){
