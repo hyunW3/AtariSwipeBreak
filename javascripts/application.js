@@ -92,7 +92,7 @@ function collisionDetection() {
 
 						}
 					}
-					/*
+/*
 				var bx = b.x - ballRadius;
 				var by = b.y - ballRadius;
 				if(y > b.y && y < b.y+brickHeight){
@@ -103,18 +103,27 @@ function collisionDetection() {
 					}
 					exec();
 				}
-				*/
-
+*/
+// real code 
+/*
 				if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight){
+					dy = -dy;
+					exec();	}
+			*/
+			if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight){
+				if(x < b.x+ballRadius  ){
+					dx = -dx;
+				} else if(x > b.x+brickWidth-ballRadius  ){
+					dx = -dx;
+				} else if(y < b.y+ballRadius ) {
+					dy = -dy;
+				} else if(y > b.y+brickHeight-ballRadius ) {
+					dy= -dy;
+				} 
+				exec();
+			}
 
-					//if(Math.min(a,b) < Math.min(c,d)){
-					//	dx = -dx;
-					//} else {
-						dy = -dy;
-					//}
-					
-					exec();	
-				}
+				
 				
 			}
 		}
