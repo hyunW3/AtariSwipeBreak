@@ -1,5 +1,13 @@
 //  cd ~/Desktop/Project/WEB/벽돌깨기\ 심화/ && git add * 
-// 190613 unsolved problem : 공여러개 만들기 & 벽돌 옆에 부딪혔을 때 dx 방향 전환하기
+// 190613 unsolved problem : 
+/* 1. 공여러개 만들기 
+	2. 다음 단계에 벽돌 한줄씩 내려오기
+	3. 바닥에 공이 닿으면 그래도 그냥 끝나기 
+	4. 닿은 위치에 공 위치시키기
+	5. 초록색 먹으면 공개수 하나씩 증가시키기 
+
+*/
+// 벽돌 옆에 부딪혔을 때 dx 방향 전환하기 - 성공 190614
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
 var info = document.getElementById("info").getContext("2d")
@@ -9,7 +17,6 @@ var y;
 function init() {
 	x = canvas.width/2;
 	y = canvas.height-30;
-	
 	brickinit();
 	window.requestAnimationFrame(mouse);
 
@@ -17,9 +24,16 @@ function init() {
 init();
 var ballRadius = 8;
 
-var cannonHeight = 20;
-var cannonWidth = 10;
-var cannonX = (canvas.width-cannonWidth)/2;
+// 바닥 만들기
+
+var lineHeight = 20;
+function Dline() {
+	ctx.beginPath();
+	ctx.rect(0, canvas.height-lineHeight, canvas.width, 1);
+	ctx.fillStyle = "#0095DD";
+	ctx.fill();
+	ctx.closePath();
+}
 
 var mouseClick = false;
 var brickCount;
@@ -92,24 +106,7 @@ function collisionDetection() {
 
 						}
 					}
-/*
-				var bx = b.x - ballRadius;
-				var by = b.y - ballRadius;
-				if(y > b.y && y < b.y+brickHeight){
-					if(x >b.x && x < b.x+brickWidth){
-						dy = -dy;
-					} else { // else 로 진행하면 한줄 전체가 없어진다.
-						dx = -dx;
-					}
-					exec();
-				}
-*/
-// real code 
-/*
-				if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight){
-					dy = -dy;
-					exec();	}
-			*/
+
 			if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight){
 				if(x < b.x+ballRadius  ){
 					dx = -dx;
@@ -131,15 +128,7 @@ function collisionDetection() {
 }
 
 
-function Dcannon() {
-	ctx.beginPath();
-	ctx.rect(cannonX, canvas.height-cannonHeight, cannonWidth, cannonHeight);
-	ctx.fillStyle = "#0095DD";
-	ctx.fill();
-	var degree = Math.atan2(dx,dy)*(180/Math.PI);
-	//ctx.rotate(degree*Math.PI/180);
-	ctx.closePath();
-}
+
 function Dball() {
 	ctx.beginPath();
 	ctx.arc(x,y, ballRadius, 0, Math.PI*2);
@@ -188,7 +177,7 @@ function mouse() {
 	function diff() {
 		info.clearRect(0, 0, 180, 50);
 		dx = clientX - x -pos.ax;
-		dy = clientY - (canvas.height-cannonHeight) - pos.ay;
+		dy = clientY - (canvas.height-lineHeight) - pos.ay;
 		var square = Math.pow(dx,2)+Math.pow(dy,2);
 		dx = (dx/Math.sqrt(square)).toFixed(2);
 		dy = (dy/Math.sqrt(square)).toFixed(2);
@@ -204,11 +193,11 @@ function mouse() {
 // https://webisora.com/blog/rotate-elements-using-javascript/
 function draw(){
 	setInterval( function() {
-		ctx.clearRect(0,0, canvas.width, canvas.height); //-cannonHeight);
-	}, 1000);
+		ctx.clearRect(0,0, canvas.width, canvas.height); 
+	}, 1000*level);
 	drawBricks();
 	Dball();
-	Dcannon();
+	Dline();
 	showStage();
 	//mouse();
 
