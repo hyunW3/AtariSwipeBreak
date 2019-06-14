@@ -1,4 +1,5 @@
-//  cd ~/Desktop/Project/WEB/벽돌깨기\ 심화/
+//  cd ~/Desktop/Project/WEB/벽돌깨기\ 심화/ && git add * 
+// 190613 unsolved problem : 공여러개 만들기 & 벽돌 옆에 부딪혔을 때 dx 방향 전환하기
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
 var info = document.getElementById("info").getContext("2d")
@@ -8,8 +9,7 @@ var y;
 function init() {
 	x = canvas.width/2;
 	y = canvas.height-30;
-	brickCount=0;
-	brokenBrickN =0;
+	
 	brickinit();
 	window.requestAnimationFrame(mouse);
 
@@ -22,8 +22,7 @@ var cannonWidth = 10;
 var cannonX = (canvas.width-cannonWidth)/2;
 
 var mouseClick = false;
-var brokenBrickN =0;
-var brickCount =0;
+var brickCount;
 var level =1;
 
 // 벽돌만들기
@@ -31,21 +30,20 @@ var brickRowCount = 4;
 var brickColumnCount = 6;
 var brickWidth = 70;
 var brickHeight = 30;
-var brickPadding = 3;
+var brickPadding = 1;
 var brickOffsetTop = 20;
 var brickOffsetLeft = 20;
 var bricks =[];
 function brickinit() {
+	brickCount =0;
 	for (var c=0; c<brickColumnCount; c++){
 		bricks[c] = [];
 		for( var r=0; r<brickRowCount; r++){
-			var st = (Math.floor(Math.random()*level)+1);
+			var st = (Math.floor(Math.random()*(level+1)));
 			brickCount += st; 
 			bricks[c][r] = {x:0, y:0, status: st};
 		}
 	}	
-	brokenBrickN = 0;
-
 }
 brickinit();
 
@@ -83,9 +81,9 @@ function collisionDetection() {
 			var b = bricks[c][r];
 			if(b.status > 0){
 				function exec() {
-						b.status--;
-						brokenBrickN++;
-						if(brokenBrickN == brickCount){
+					b.status--;
+					brickCount--;
+					if(brickCount == 0){
 							alert("Next stage");
 							level++;
 							mouseClick = false;
@@ -94,15 +92,30 @@ function collisionDetection() {
 
 						}
 					}
-				if(x > b.x && x< b.x+brickWidth && y> b.y && y< b.y+brickHeight){
-					dy = -dy;
-					exec()
-					
-				}else if(x < b.x && x > b.x+brickWidth && y> b.y && y< b.y+brickHeight ){
-					dx = -dx;
+					/*
+				var bx = b.x - ballRadius;
+				var by = b.y - ballRadius;
+				if(y > b.y && y < b.y+brickHeight){
+					if(x >b.x && x < b.x+brickWidth){
+						dy = -dy;
+					} else { // else 로 진행하면 한줄 전체가 없어진다.
+						dx = -dx;
+					}
 					exec();
-
 				}
+				*/
+
+				if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight){
+
+					//if(Math.min(a,b) < Math.min(c,d)){
+					//	dx = -dx;
+					//} else {
+						dy = -dy;
+					//}
+					
+					exec();	
+				}
+				
 			}
 		}
 	}
@@ -176,13 +189,14 @@ function mouse() {
 		decision();
 	};
 	decision();
-
 };
 // rotate 
 // http://www.williammalone.com/briefs/how-to-rotate-html5-canvas-around-center/
 // https://webisora.com/blog/rotate-elements-using-javascript/
 function draw(){
-	ctx.clearRect(0,0, canvas.width, canvas.height); //-cannonHeight);
+	setInterval( function() {
+		ctx.clearRect(0,0, canvas.width, canvas.height); //-cannonHeight);
+	}, 1000);
 	drawBricks();
 	Dball();
 	Dcannon();
@@ -198,8 +212,8 @@ draw();
 function shoot() {
 	//Dball();
 	if(mouseClick){
-	x += dx*2;
-	y += dy*2;
+	x += dx*5;
+	y += dy*5;
 	collisionDetection();
 	/*
 	if( x+2*dx > canvas.width-ballRadius || x+2*dx < ballRadius){
@@ -232,6 +246,7 @@ document.addEventListener("click", function(){
 	mouseClick = true;
 	//window.cancelAnimationFrame(mouse);
 	shoot();
+	//document.removeEventListener("click",f);
 });
 
 
