@@ -3,23 +3,27 @@
 /* 1. 공여러개 만들기 
 	2. 다음 단계에 벽돌 한줄씩 내려오기
 	3. 바닥에 공이 닿으면 그래도 그냥 끝나기 
-	4. 닿은 위치에 공 위치시키기
+	
 	5. 초록색 먹으면 공개수 하나씩 증가시키기 
+*/
+/* 벽돌 옆에 부딪혔을 때 dx 방향 전환하기 - 성공 190614
+4. 닿은 위치에 공 위치시키기 -성공 190615
+	그런데 벽돌도 다시 생김
 
 */
-// 벽돌 옆에 부딪혔을 때 dx 방향 전환하기 - 성공 190614
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
 var info = document.getElementById("info").getContext("2d")
 
-var x;
+var x = canvas.width/2;		
 var y;
+var level =1;
 function init() {
-	x = canvas.width/2;
+	mouseClick = false;
 	y = canvas.height-30;
 	brickinit();
-	window.requestAnimationFrame(mouse);
-
+	window.cancelAnimationFrame(shoot);
+	mouse();
 };
 init();
 var ballRadius = 8;
@@ -36,11 +40,10 @@ function Dline() {
 }
 
 var mouseClick = false;
-var brickCount;
-var level =1;
+
 
 // 벽돌만들기
-var brickRowCount = 4;
+var brickRowCount = 1;
 var brickColumnCount = 6;
 var brickWidth = 70;
 var brickHeight = 30;
@@ -49,17 +52,17 @@ var brickOffsetTop = 20;
 var brickOffsetLeft = 20;
 var bricks =[];
 function brickinit() {
-	brickCount =0;
 	for (var c=0; c<brickColumnCount; c++){
 		bricks[c] = [];
 		for( var r=0; r<brickRowCount; r++){
 			var st = (Math.floor(Math.random()*(level+1)));
-			brickCount += st; 
 			bricks[c][r] = {x:0, y:0, status: st};
 		}
 	}	
+	//drawBricks();
 }
 brickinit();
+
 
 function drawBricks() {
 	for( var c=0; c<brickColumnCount; c++){
@@ -96,16 +99,7 @@ function collisionDetection() {
 			if(b.status > 0){
 				function exec() {
 					b.status--;
-					brickCount--;
-					if(brickCount == 0){
-							alert("Next stage");
-							level++;
-							mouseClick = false;
-							window.cancelAnimationFrame(shoot);
-							init();
-
-						}
-					}
+				}
 
 			if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight){
 				if(x < b.x+ballRadius  ){
@@ -209,42 +203,80 @@ draw();
 
 function shoot() {
 	//Dball();
-	if(mouseClick){
+if(mouseClick){
 	x += dx*5;
 	y += dy*5;
 	collisionDetection();
-	/*
+	
 	if( x+2*dx > canvas.width-ballRadius || x+2*dx < ballRadius){
 		dx = -dx;
 	} 
 	else if( y+2*dy < ballRadius) {
 		dy = -dy;
 	} 
-	if (!(y+2*dy > canvas.height -ballRadius)){
+	
+	if (!(y+2*dy > canvas.height -ballRadius-lineHeight)){
 		window.requestAnimationFrame(shoot);
 	} else{
-		alert("died!");
-		init();
-		document.location.reload();
+		next();
 	}
-	*/
+	/*
 	if( x+2*dx > canvas.width-ballRadius || x+2*dx < ballRadius){
 		dx = -dx;
 	} 
-	else if( y+2*dy < ballRadius || (y+2*dy > canvas.height -ballRadius)) {
+	else if( y+2*dy < ballRadius || (y+2*dy > canvas.height -ballRadius-lineHeight)) {
 		dy = -dy;
 	} 
 	window.requestAnimationFrame(shoot);
+	*/
 	//var cv = document.getElementById("myCanvas");
 	//var pos = elePos(cv);
 }
+}
+
+function next () {
+	mouseClick = false;
+	y = canvas.height-30;
+	brickNext();
+	level++;
+	window.cancelAnimationFrame(shoot);
+	mouse();
+}
+
+function brickNext() {
+	brickRowCount++;
+	for(var c=0; c<brickColumnCount; c++){
+		for(var r=brickRowCount; r>=0; r--){
+			if(r === 0){
+				var st = Math.floor(Math.random()*(level+1));
+				bricks[c][0] = {x:0, y:0, status: st};
+			} else {
+				var lr = r-1;
+				/*
+				bricks[c][r].x = bricks[c][lr].x;
+				bricks[c][r].y = bricks[c][lr].y;
+				bricks[c][r].status = bricks[c][lr].status;		
+				*/
+				bricks[c][r] = bricks[c][lr];		
+			}
+
+		}
+
+	}
+	var deci = 0;
+	for(var c=0; c<brickColumnCount; c++){	
+		deci += bricks[c][brickRowCount-1].status;
+	}
+	if(deci === 0){
+		brickRowCount--;
+	}
+
 }
 
 document.addEventListener("click", function(){
 	mouseClick = true;
 	//window.cancelAnimationFrame(mouse);
 	shoot();
-	//document.removeEventListener("click",f);
 });
 
 

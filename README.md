@@ -1,8 +1,8 @@
 # AtariSwipeBreak
 make swipe break in javascript
 
-<<<<<<< HEAD
+#progress 1 - 다깨면 스테이지를 넘어가는 방식
 ![alt progress 1](piclog/progress1.png)
-=======
-![alt progress 1](progress1.PNG)
->>>>>>> 5221c87d704a6a6a6162af0ded9a8e20a3ac7ba0
+
+#progress 2 - 한칸씩 블록이 내려가는 스와이프 블록깨기 방식대로 됨 ( 공 개수 정의하는게 중요)
+![alt progress 2](piclog/progress2/progress2.png)
