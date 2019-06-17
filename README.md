@@ -1,8 +1,9 @@
 # AtariSwipeBreak
 make swipe break in javascript
 
-#progress 1 - ´Ù±ú¸é ½ºÅ×ÀÌÁö¸¦ ³Ñ¾î°¡´Â ¹æ½Ä
-![alt progress 1](piclog/progress1.png)
+#progress 1 - ë‹¤ê¹¨ë©´ ìŠ¤í…Œì´ì§€ë¥¼ ë„˜ì–´ê°€ëŠ” ë°©ì‹
+![alt progress 1](blob/master/piclog/progress1.PNG)
 
-#progress 2 - ÇÑÄ­¾¿ ºí·ÏÀÌ ³»·Á°¡´Â ½º¿ÍÀÌÇÁ ºí·Ï±ú±â ¹æ½Ä´ë·Î µÊ ( °ø °³¼ö Á¤ÀÇÇÏ´Â°Ô Áß¿ä)
+
+#progress 2 - í•œì¹¸ì”© ë¸”ë¡ì´ ë‚´ë ¤ê°€ëŠ” ìŠ¤ì™€ì´í”„ ë¸”ë¡ê¹¨ê¸° ë°©ì‹ëŒ€ë¡œ ë¨ ( ê³µ ê°œìˆ˜ ì •ì˜í•˜ëŠ”ê²Œ ì¤‘ìš”)
 ![alt progress 2](piclog/progress2/progress2.png)
