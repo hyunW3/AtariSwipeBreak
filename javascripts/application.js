@@ -1,31 +1,37 @@
 //  cd ~/Desktop/Project/WEB/벽돌깨기\ 심화/ && git add * 
 // 190613 unsolved problem : 
 /* 1. 공여러개 만들기 
-	2. 다음 단계에 벽돌 한줄씩 내려오기
-	3. 바닥에 공이 닿으면 그래도 그냥 끝나기 
-	
+		 
+	공 발사 가이드라인 만들기 -- 벽돌에 닿으면 없어져야되는데 실패하고 
+		가이드라인과 조금 다르게  발사가된다
 	5. 초록색 먹으면 공개수 하나씩 증가시키기 
 */
-/* 벽돌 옆에 부딪혔을 때 dx 방향 전환하기 - 성공 190614
-4. 닿은 위치에 공 위치시키기 -성공 190615
-	그런데 벽돌도 다시 생김
+/*	성공 내역
+	벽돌 옆에 부딪혔을 때 dx 방향 전환하기 - 성공 190614
+	닿은 위치에 공 위치시키기 -성공 190615
+	다음 단계에 벽돌 한줄씩 내려오기 190616
+	벽돌이 라인 넘어가면 게임 끝내기 --190617 다시 시작할때 첫번째 줄 status 값이 1 이상이 나온다
 
 */
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
 var info = document.getElementById("info").getContext("2d")
 
-var x = canvas.width/2;		
+var x;		
 var y;
-var level =1;
+var level;
 function init() {
 	mouseClick = false;
+	x = canvas.width/2;
 	y = canvas.height-30;
+	brickRowCount = 1;
+	level =1;
 	brickinit();
 	window.cancelAnimationFrame(shoot);
-	mouse();
+	document.getElementById("myCanvas").addEventListener("onmouseover", mouse());
 };
 init();
+
 var ballRadius = 8;
 
 // 바닥 만들기
@@ -52,6 +58,7 @@ var brickOffsetTop = 20;
 var brickOffsetLeft = 20;
 var bricks =[];
 function brickinit() {
+	bricks =[];
 	for (var c=0; c<brickColumnCount; c++){
 		bricks[c] = [];
 		for( var r=0; r<brickRowCount; r++){
@@ -162,10 +169,11 @@ function mouse() {
 	function decision() {
 		if(!mouseClick){
 			window.requestAnimationFrame(diff);
+
 		} else {
 			window.cancelAnimationFrame(diff);
 		}
-	} 
+	}
 	
 	//Draw a rectangle at the mouse's last know position.
 	function diff() {
@@ -177,6 +185,7 @@ function mouse() {
 		dy = (dy/Math.sqrt(square)).toFixed(2);
 		info.font = "16px Arial"
 		info.fillText("dx is "+dx +" dy is "+dy,8,20);
+		shootline(x,y,dx,dy);
 		//window.requestAnimationFrame(diff);
 		decision();
 	};
@@ -185,6 +194,14 @@ function mouse() {
 // rotate 
 // http://www.williammalone.com/briefs/how-to-rotate-html5-canvas-around-center/
 // https://webisora.com/blog/rotate-elements-using-javascript/
+function shootline(x,y,dx,dy) {
+		ctx.beginPath();
+		ctx.moveTo(x,y);
+		var kx = x + dx*canvas.width;
+		var ky = y + dy*canvas.height;
+		ctx.lineTo(kx,ky);
+		ctx.stroke();
+}
 function draw(){
 	setInterval( function() {
 		ctx.clearRect(0,0, canvas.width, canvas.height); 
@@ -204,8 +221,8 @@ draw();
 function shoot() {
 	//Dball();
 if(mouseClick){
-	x += dx*5;
-	y += dy*5;
+	x += dx*2;
+	y += dy*2;
 	collisionDetection();
 	
 	if( x+2*dx > canvas.width-ballRadius || x+2*dx < ballRadius){
@@ -270,10 +287,14 @@ function brickNext() {
 	if(deci === 0){
 		brickRowCount--;
 	}
+	if(brickRowCount >= 10){
+		alert("The Game end!");
+		init();
+	}
 
 }
 
-document.addEventListener("click", function(){
+document.getElementById("myCanvas").addEventListener("click", function(){
 	mouseClick = true;
 	//window.cancelAnimationFrame(mouse);
 	shoot();
