@@ -2,8 +2,7 @@
 // 190613 unsolved problem : 
 /* 1. 공여러개 만들기 
 		 
-	공 발사 가이드라인 만들기 -- 벽돌에 닿으면 없어져야되는데 실패하고 
-		가이드라인과 조금 다르게  발사가된다
+
 	5. 초록색 먹으면 공개수 하나씩 증가시키기 
 */
 /*	성공 내역
@@ -11,7 +10,8 @@
 	닿은 위치에 공 위치시키기 -성공 190615
 	다음 단계에 벽돌 한줄씩 내려오기 190616
 	벽돌이 라인 넘어가면 게임 끝내기 --190617 다시 시작할때 첫번째 줄 status 값이 1 이상이 나온다
-
+	가이드라인과 조금 다르게  발사가된다 190618 - 해결
+	공 발사 가이드라인 만들기 -- 벽돌에 닿으면 없어져야되는데 실패했다.
 */
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
@@ -181,10 +181,10 @@ function mouse() {
 		dx = clientX - x -pos.ax;
 		dy = clientY - (canvas.height-lineHeight) - pos.ay;
 		var square = Math.pow(dx,2)+Math.pow(dy,2);
-		dx = (dx/Math.sqrt(square)).toFixed(2);
-		dy = (dy/Math.sqrt(square)).toFixed(2);
+		dx = (dx/Math.sqrt(square));
+		dy = (dy/Math.sqrt(square));
 		info.font = "16px Arial"
-		info.fillText("dx is "+dx +" dy is "+dy,8,20);
+		info.fillText("dx is "+dx.toFixed(2) +" dy is "+Math.abs(dy.toFixed(2)),8,20);
 		shootline(x,y,dx,dy);
 		//window.requestAnimationFrame(diff);
 		decision();
@@ -196,16 +196,41 @@ function mouse() {
 // https://webisora.com/blog/rotate-elements-using-javascript/
 function shootline(x,y,dx,dy) {
 		ctx.beginPath();
-		ctx.moveTo(x,y);
-		var kx = x + dx*canvas.width;
-		var ky = y + dy*canvas.height;
+		ctx.moveTo(x+dx*ballRadius,y+dy*ballRadius);
+		var kx = x;
+		var ky = y;
+		var flag = false;
+		function check() {
+			for(var c=0; c<brickColumnCount; c++){
+				for(var r=0; r<brickRowCount; r++){
+					var b = bricks[c][r];
+					if(flag == true) break;
+					if(b.status > 0){
+						if(b.x < kx && kx <b.x+brickWidth && b.y < ky && b.y+brickHeight > ky){
+							flag = true;
+							
+						}
+					}
+				}
+			}
+		}
+		do {
+			kx += dx*10;
+			ky += dy*10;
+			check();
+			if(flag) break;
+			//flag = true;
+		} while(!(kx <0 || kx>canvas.width || ky <0 ));
+
+		//var kx = x + dx*canvas.height;
+		//var ky = y + dy*canvas.height;
 		ctx.lineTo(kx,ky);
 		ctx.stroke();
 }
 function draw(){
 	setInterval( function() {
 		ctx.clearRect(0,0, canvas.width, canvas.height); 
-	}, 1000*level);
+	}, 100);
 	drawBricks();
 	Dball();
 	Dline();
